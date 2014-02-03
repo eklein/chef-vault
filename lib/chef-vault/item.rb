@@ -34,7 +34,7 @@ class ChefVault::Item < Chef::DataBagItem
     @secret = secret
   end
 
-  def clients(search=nil, action=:add)
+  def clients(search = nil, action = :add)
     if search
       results_returned = false
 
@@ -48,8 +48,8 @@ class ChefVault::Item < Chef::DataBagItem
         when :delete
           keys.delete(node.name, "clients")
         else
-          raise ChefVault::Exceptions::KeysActionNotValid,
-            "#{action} is not a valid action"
+          fail ChefVault::Exceptions::KeysActionNotValid,
+               "#{action} is not a valid action"
         end
       end
 
@@ -62,7 +62,7 @@ class ChefVault::Item < Chef::DataBagItem
     end
   end
 
-  def search(search_query=nil)
+  def search(search_query = nil)
     if search_query
       keys.search_query(search_query)
     else
@@ -70,7 +70,7 @@ class ChefVault::Item < Chef::DataBagItem
     end
   end
 
-  def admins(admins=nil, action=:add)
+  def admins(admins = nil, action = :add)
     if admins
       admins.split(",").each do |admin|
         admin.strip!
@@ -80,8 +80,8 @@ class ChefVault::Item < Chef::DataBagItem
         when :delete
           keys.delete(admin, "admins")
         else
-          raise ChefVault::Exceptions::KeysActionNotValid,
-            "#{action} is not a valid action"
+          fail ChefVault::Exceptions::KeysActionNotValid,
+               "#{action} is not a valid action"
         end
       end
     else
@@ -95,12 +95,12 @@ class ChefVault::Item < Chef::DataBagItem
 
   def secret
     if @keys.include?(Chef::Config[:node_name])
-      private_key = OpenSSL::PKey::RSA.new(open(Chef::Config[:client_key]).read())
+      private_key = OpenSSL::PKey::RSA.new(open(Chef::Config[:client_key]).read)
       private_key.private_decrypt(Base64.decode64(@keys[Chef::Config[:node_name]]))
     else
-      raise ChefVault::Exceptions::SecretDecryption,
-        "#{data_bag}/#{id} is not encrypted with your public key.  "\
-        "Contact an administrator of the vault item to encrypt for you!"
+      fail ChefVault::Exceptions::SecretDecryption,
+           "#{data_bag}/#{id} is not encrypted with your public key.  "\
+           "Contact an administrator of the vault item to encrypt for you!"
     end
   end
 
@@ -123,7 +123,7 @@ class ChefVault::Item < Chef::DataBagItem
     reload_raw_data
   end
 
-  def generate_secret(key_size=32)
+  def generate_secret(key_size = 32)
     # Defaults to 32 bytes, as this is the size that a Chef
     # Encrypted Data Bag Item will digest all secrets down to anyway
     SecureRandom.random_bytes(key_size)
@@ -139,15 +139,14 @@ class ChefVault::Item < Chef::DataBagItem
     super
   end
 
-  def save(item_id=@raw_data['id'])
-
+  def save(item_id = @raw_data['id'])
     # validate the format of the id before attempting to save
     validate_id!(item_id)
 
     # save the keys first, raising an error if no keys were defined
     if keys.admins.empty? && keys.clients.empty?
-      raise ChefVault::Exceptions::NoKeysDefined,
-        "No keys defined for #{item_id}"
+      fail ChefVault::Exceptions::NoKeysDefined,
+            "No keys defined for #{item_id}"
     end
 
     keys.save
@@ -162,11 +161,11 @@ class ChefVault::Item < Chef::DataBagItem
       data_bag_item_path = File.join(data_bag_path, item_id)
 
       FileUtils.mkdir(data_bag_path) unless File.exists?(data_bag_path)
-      File.open("#{data_bag_item_path}.json",'w') do |file|
-        file.write(JSON.pretty_generate(self.raw_data))
+      File.open("#{data_bag_item_path}.json", 'w') do |file|
+        file.write(JSON.pretty_generate(raw_data))
       end
 
-      self.raw_data
+      raw_data
     else
       begin
         chef_data_bag = Chef::DataBag.load(data_bag)
@@ -218,7 +217,7 @@ class ChefVault::Item < Chef::DataBagItem
         raise http_error
       end
     rescue Chef::Exceptions::ValidationFailed
-      raise ChefVault::Exceptions::ItemNotFound,
+      fail ChefVault::Exceptions::ItemNotFound,
         "#{vault}/#{name} could not be found"
     end
 
@@ -226,6 +225,7 @@ class ChefVault::Item < Chef::DataBagItem
   end
 
   private
+
   def encrypt!
     @raw_data = Chef::EncryptedDataBagItem.encrypt_data_bag_item(self, @secret)
     @encrypted = true

@@ -18,7 +18,6 @@ require 'chef/knife/vault_base'
 class Chef
   class Knife
     class VaultEdit < Knife
-
       include Chef::Knife::VaultBase
 
       banner "knife vault edit VAULT ITEM (options)"
@@ -38,7 +37,7 @@ class Chef
           begin
             vault_item = ChefVault::Item.load(vault, item)
 
-            filtered_vault_data = vault_item.raw_data.select{|x| x != 'id'}
+            filtered_vault_data = vault_item.raw_data.select { |x| x != 'id' }
 
             updated_vault_json = edit_data(filtered_vault_data)
 
@@ -54,7 +53,7 @@ class Chef
 
             vault_item.save
           rescue ChefVault::Exceptions::KeysNotFound,
-            ChefVault::Exceptions::ItemNotFound
+                 ChefVault::Exceptions::ItemNotFound
 
             raise ChefVault::Exceptions::ItemNotFound,
               "#{vault}/#{item} does not exist, "\
@@ -67,4 +66,3 @@ class Chef
     end
   end
 end
-

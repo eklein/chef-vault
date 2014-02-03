@@ -18,7 +18,6 @@ require 'chef/knife/vault_base'
 class Chef
   class Knife
     class VaultUpdate < Knife
-
       include Chef::Knife::VaultBase
 
       banner "knife vault update VAULT ITEM VALUES (options)"
@@ -63,7 +62,7 @@ class Chef
 
             if file
               vault_item["file-name"] = File.basename(file)
-              vault_item["file-content"] = File.open(file){ |file| file.read() }
+              vault_item["file-content"] = File.open(file) { |f| f.read }
             end
 
             vault_item.search(search) if search
@@ -72,7 +71,7 @@ class Chef
 
             vault_item.save
           rescue ChefVault::Exceptions::KeysNotFound,
-            ChefVault::Exceptions::ItemNotFound
+                 ChefVault::Exceptions::ItemNotFound
 
             raise ChefVault::Exceptions::ItemNotFound,
               "#{vault}/#{item} does not exist, "\

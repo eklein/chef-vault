@@ -18,7 +18,6 @@ require 'chef/knife/vault_base'
 class Chef
   class Knife
     class VaultRemove < Knife
-
       include Chef::Knife::VaultBase
 
       banner "knife vault remove VAULT ITEM VALUES (options)"
@@ -57,7 +56,7 @@ class Chef
               rescue JSON::ParserError
                 remove_items = values.split(",")
               rescue Exception => e
-                raise e
+                fail e
               end
 
               remove_items.each do |key|
@@ -71,9 +70,9 @@ class Chef
 
             vault_item.rotate_keys!
           rescue ChefVault::Exceptions::KeysNotFound,
-            ChefVault::Exceptions::ItemNotFound
+                 ChefVault::Exceptions::ItemNotFound
 
-            raise ChefVault::Exceptions::ItemNotFound,
+            fail ChefVault::Exceptions::ItemNotFound,
               "#{vault}/#{item} does not exist, "\
               "use 'knife vault create' to create."
           end

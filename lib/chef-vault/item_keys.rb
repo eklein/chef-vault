@@ -42,7 +42,7 @@ class ChefVault::ItemKeys < Chef::DataBagItem
     raw_data[type].delete(chef_client)
   end
 
-  def search_query(search_query=nil)
+  def search_query(search_query = nil)
     if search_query
       @raw_data["search_query"] = search_query
     else
@@ -58,18 +58,18 @@ class ChefVault::ItemKeys < Chef::DataBagItem
     @raw_data["admins"]
   end
 
-  def save(item_id=@raw_data['id'])
+  def save(item_id = @raw_data['id'])
     if Chef::Config[:solo]
       data_bag_path = File.join(Chef::Config[:data_bag_path],
                                 data_bag)
       data_bag_item_path = File.join(data_bag_path, item_id)
 
       FileUtils.mkdir(data_bag_path) unless File.exists?(data_bag_path)
-      File.open("#{data_bag_item_path}.json",'w') do |file|
-        file.write(JSON.pretty_generate(self.raw_data))
+      File.open("#{data_bag_item_path}.json", 'w') do |file|
+        file.write(JSON.pretty_generate(raw_data))
       end
 
-      self.raw_data
+      raw_data
     else
       begin
         chef_data_bag = Chef::DataBag.load(data_bag)
@@ -121,7 +121,7 @@ class ChefVault::ItemKeys < Chef::DataBagItem
         raise http_error
       end
     rescue Chef::Exceptions::ValidationFailed
-      raise ChefVault::Exceptions::KeysNotFound,
+      fail ChefVault::Exceptions::KeysNotFound,
             "#{vault}/#{name} could not be found"
     end
 

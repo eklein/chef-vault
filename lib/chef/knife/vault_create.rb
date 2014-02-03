@@ -18,7 +18,6 @@ require 'chef/knife/vault_base'
 class Chef
   class Knife
     class VaultCreate < Knife
-
       include Chef::Knife::VaultBase
 
       banner "knife vault create VAULT ITEM VALUES (options)"
@@ -56,12 +55,12 @@ class Chef
         if vault && item && (search || admins)
           begin
             vault_item = ChefVault::Item.load(vault, item)
-            raise ChefVault::Exceptions::ItemAlreadyExists,
+            fail ChefVault::Exceptions::ItemAlreadyExists,
               "#{vault_item.data_bag}/#{vault_item.id} already exists, "\
               "use 'knife vault remove' 'knife vault update' "\
               "or 'knife vault edit' to make changes."
           rescue ChefVault::Exceptions::KeysNotFound,
-            ChefVault::Exceptions::ItemNotFound
+                 ChefVault::Exceptions::ItemNotFound
             vault_item = ChefVault::Item.new(vault, item)
 
             if values || json_file || file
@@ -71,10 +70,10 @@ class Chef
 
               if file
                 vault_item["file-name"] = File.basename(file)
-                vault_item["file-content"] = File.open(file){ |file| file.read() }
+                vault_item["file-content"] = File.open(file) { |f| f.read }
               end
             else
-              vault_json = edit_data(Hash.new)
+              vault_json = edit_data({})
               vault_json.each do |key, value|
                 vault_item[key] = value
               end

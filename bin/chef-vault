@@ -9,9 +9,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,7 +34,7 @@ options_config = {
     description: "Vault to look in",
     default: nil,
     optional: false
-  },  
+  },
   item: {
     short: "i",
     long: "item",
@@ -57,7 +57,7 @@ options_config.each do |option, config|
     banner << "[--#{config[:long]} #{config[:long].upcase}] "
   else
     banner << "--#{config[:long]} #{config[:long].upcase} "
-  end    
+  end
 end
 
 options = {}
@@ -75,7 +75,7 @@ OptionParser.new do |opts|
 end.parse!
 
 options_config.each do |option, config|
-  raise OptionParser::MissingArgument, option if (options[option].nil? && !config[:optional])
+  fail OptionParser::MissingArgument, option if options[option].nil? && !config[:optional]
 end
 
 options_config.each do |option, config|
@@ -83,7 +83,7 @@ options_config.each do |option, config|
 end
 
 require 'rubygems'
-$:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
 require 'chef-vault'
 
 ChefVault.load_config(options[:chef])
